@@ -6,6 +6,18 @@ The todoify-backend repository is designed to serve as the backend for the Todoi
 - 🗂️ **CRUD Operations for Tasks**: Create, read, update, and delete tasks efficiently.
 - 🌐 **API Endpoints for Frontend Integration**: Seamless communication with the frontend application.
 
+## API Endpoints
+
+The backend exposes the following RESTful API routes:
+
+| Method | Endpoint       | Description             |
+|--------|----------------|-------------------------|
+| GET    | `/get`         | Fetch all to-do tasks   |
+| POST   | `/add`         | Add a new to-do task    |
+| PUT    | `/update/:id`  | Mark task as completed  |
+| DELETE | `/delete/:id`  | Delete a task           |
+
+
 ## 🛠️ Technologies Used
 
 - 🟢 **Node.js**
