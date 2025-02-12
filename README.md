@@ -26,3 +26,25 @@ The todoify-backend repository is designed to serve as the backend for the Todoi
 
    ```bash
    git clone https://github.com/geekyneha/todoify-backend.git
+
+2. **Navigate to the project directory**:
+
+   ```bash
+   cd todify-backend
+
+3. **Install dependencies**:
+
+   ```bash
+   npm install
+4. **Set up environment variables:**
+   
+    Create a .env file
+    PORT=5000
+    MONGODB_URI=your_mongodb_uri
+
+5. **Start the server**:
+
+
+    ```bash
+    npm start 
+   
