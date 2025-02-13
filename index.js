@@ -22,7 +22,20 @@ app.get("/get", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-// Add a new task
+// // Add a new task
+// app.post("/add", async (req, res) => {
+//   try {
+//     const { task } = req.body;
+//     if (!task.trim())
+//       return res.status(400).json({ error: "Task cannot be empty" });
+
+//     const newTodo = new TodoModel({ task });
+//     await newTodo.save();
+//     res.status(201).json(newTodo);
+//   } catch (error) {
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 app.post("/add", async (req, res) => {
   try {
     const { task } = req.body;
@@ -30,8 +43,9 @@ app.post("/add", async (req, res) => {
       return res.status(400).json({ error: "Task cannot be empty" });
 
     const newTodo = new TodoModel({ task });
-    await newTodo.save();
-    res.status(201).json(newTodo);
+    const savedTodo = await newTodo.save(); // Save to DB and get full object
+
+    res.status(201).json(savedTodo); // Return full task object
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
