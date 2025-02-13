@@ -1,62 +1,41 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const TodoModel = require("./Models/Todo"); // Import your schema
+const dotenv = require("dotenv");
+const TodoModel = require("./Models/Todo");
 
+const port = process.env.PORT || 3001;
+const MONGO_URI = process.env.MONGO_URI;
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Connect to MongoDB
 mongoose
-  .connect("YOUR_MONGO_DB_URI", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+app.get("/get", (req, res) => {
+  TodoModel.find()
+    .then((result) => res.json(result))
+    .catch((err) => res.json(err));
+});
+
+app.post("/add", (req, res) => {
+  const task = req.body.task;
+  TodoModel.create({
+    task: task,
   })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.log(err));
-
-// Get all todos
-app.get("/get", async (req, res) => {
-  try {
-    const todos = await TodoModel.find();
-    res.json(todos);
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+    .then((result) => res.json(result))
+    .catch((err) => res.json(err));
 });
 
-// Add a new task
-app.post("/add", async (req, res) => {
-  try {
-    const { task } = req.body;
-    if (!task.trim())
-      return res.status(400).json({ error: "Task cannot be empty" });
-
-    const newTodo = new TodoModel({ task });
-    await newTodo.save();
-    res.status(201).json(newTodo);
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// Update task status (mark as completed)
-app.put("/update/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const todo = await TodoModel.findById(id);
-    if (!todo) return res.status(404).json({ error: "Task not found" });
-
-    todo.status = !todo.status; // Toggle status
-    await todo.save();
-    res.json(todo);
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+app.put("/update/:id", (req, res) => {
+  const { id } = req.params;
+  TodoModel.findByIdAndUpdate({ _id: id }, { status: true })
+    .then((result) => res.json(result))
+    .catch((err) => res.json(err));
 });
 
 // ✨ Update task text (Edit functionality)
@@ -80,19 +59,13 @@ app.put("/edit/:id", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.delete("/delete/:id", (req, res) => {
+  const { id } = req.params;
 
-// Delete a task
-app.delete("/delete/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedTask = await TodoModel.findByIdAndDelete(id);
-    if (!deletedTask) return res.status(404).json({ error: "Task not found" });
-
-    res.json({ message: "Task deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  TodoModel.findByIdAndDelete({ _id: id })
+    .then((result) => res.json(result))
+    .catch((err) => res.json(err));
 });
-
-// Start the server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
