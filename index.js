@@ -22,13 +22,19 @@ app.get("/get", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-app.post("/add", (req, res) => {
-  const task = req.body.task;
-  TodoModel.create({
-    task: task,
-  })
-    .then((result) => res.json(result))
-    .catch((err) => res.json(err));
+// Add a new task
+app.post("/add", async (req, res) => {
+  try {
+    const { task } = req.body;
+    if (!task.trim())
+      return res.status(400).json({ error: "Task cannot be empty" });
+
+    const newTodo = new TodoModel({ task });
+    await newTodo.save();
+    res.status(201).json(newTodo);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.put("/update/:id", (req, res) => {
